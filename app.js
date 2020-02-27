@@ -1,5 +1,5 @@
 const DotEnv = require('dotenv');
-const Bot = require('./bot');
+const Bot = require('./src/bot');
 
 DotEnv.config();
 new Bot().initialize();

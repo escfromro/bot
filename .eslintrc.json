@@ -23,7 +23,7 @@
             "error",
             {
                 "devDependencies": [
-                    "src/dev.js"
+                    "app.js"
                 ]
             }
         ]

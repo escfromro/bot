@@ -1,21 +1,20 @@
 {
     "name": "@escfromro/bot",
-    "version": "1.0.0",
     "description": "RoBot",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/escfromro/bot.git"
-    },
-    "main": "src/dev.js",
+    "version": "1.0.1",
+    "author": "Highstrike",
+    "license": "MIT",
+    "repository": "escfromro/bot",
+    "homepage": "https://escapefromromania.ro",
+    "main": "src/bot.js",
     "engines": {
         "node": ">=9.0.0"
     },
     "scripts": {
-        "start": "nodemon src/dev.js",
+        "lint": "eslint .",
+        "start": "nodemon app.js",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
-    "author": "Highstrike",
-    "license": "MIT",
     "dependencies": {
         "discord.js": "github:discordjs/discord.js#11.5-dev",
         "javascript-time-ago": "^2.0.7",
