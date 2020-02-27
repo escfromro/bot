@@ -1,0 +1,36 @@
+{
+    "name": "@escfromro/bot",
+    "version": "1.0.0",
+    "description": "RoBot",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/escfromro/bot.git"
+    },
+    "main": "src/dev.js",
+    "engines": {
+        "node": ">=9.0.0"
+    },
+    "scripts": {
+        "start": "nodemon src/dev.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Highstrike",
+    "license": "MIT",
+    "dependencies": {
+        "discord.js": "github:discordjs/discord.js#11.5-dev",
+        "javascript-time-ago": "^2.0.7",
+        "knex": "^0.20.10",
+        "lodash": "^4.17.15",
+        "mysql": "^2.18.1",
+        "twitch": "^4.0.5",
+        "winston": "^3.2.1"
+    },
+    "devDependencies": {
+        "dotenv": "^8.2.0",
+        "eslint": "^6.8.0",
+        "eslint-config-airbnb": "^18.0.1",
+        "eslint-config-airbnb-base": "^14.0.0",
+        "eslint-plugin-import": "^2.20.1",
+        "nodemon": "^2.0.2"
+    }
+}
