@@ -111,6 +111,7 @@ class Bot {
 
                 await this.knex.truncateLiveStreamers();
                 await this.knex.saveLiveStreamers(members);
+                this.log.info(`Saved ${members.length} live ${Bot.lex(members.length)} in db: ${_.map(members, 'user.tag').join(', ')}`);
                 return members;
             }
 

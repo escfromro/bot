@@ -43,7 +43,6 @@ class KnexWrapper {
         }));
 
         await this.client(process.env.DB_TABLE_LIVE_STREAMERS).insert(results);
-        this.log.info(`Saved ${members.length} members in DB`);
     }
 
     static now(date) {
