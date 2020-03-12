@@ -1,14 +1,14 @@
 {
     "name": "@escfromro/bot",
     "description": "RoBot",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "author": "Highstrike",
     "license": "MIT",
     "repository": "escfromro/bot",
     "homepage": "https://escapefromromania.ro",
     "main": "src/bot.js",
     "engines": {
-        "node": ">=9.0.0"
+        "node": ">=12.0.0"
     },
     "scripts": {
         "lint": "eslint .",
@@ -16,12 +16,12 @@
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "dependencies": {
-        "discord.js": "github:discordjs/discord.js#11.5-dev",
+        "discord.js": "^12.0.2",
         "javascript-time-ago": "^2.0.7",
-        "knex": "^0.20.10",
+        "knex": "^0.20.11",
         "lodash": "^4.17.15",
         "mysql": "^2.18.1",
-        "twitch": "^4.0.5",
+        "twitch": "^4.0.6",
         "winston": "^3.2.1"
     },
     "devDependencies": {

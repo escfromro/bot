@@ -23,34 +23,35 @@ class DiscordWrapper {
             type: process.env.BOT_PRESENCE_TYPE,
         });
 
-        this.log.verbose(`Activity set to "${_.capitalize(process.env.BOT_PRESENCE_TYPE.toLowerCase())} ${presence.game ? presence.game.name : 'none'}"`);
+        const { 0: Activity } = presence.activities;
+        this.log.verbose(`Activity set to "${_.capitalize(Activity.type.toLowerCase())} ${Activity.name}"`);
     }
 
-    static filterGuildMembers(Guild, Role) {
-        if (_.isNil(Role)) return [];
+    // static filterGuildMembers(Guild, Role) {
+    //     if (_.isNil(Role)) return [];
 
-        return Guild.members.filter((GuildMember) => {
-            const streamer = GuildMember.roles.has(Role.id);
-            const live = GuildMember.presence.activities.some((Game) => Game.streaming);
+    //     return Guild.members.filter((GuildMember) => {
+    //         const streamer = GuildMember.roles.has(Role.id);
+    //         const live = GuildMember.presence.activities.some((Game) => Game.streaming);
 
-            return streamer && live; // has partner role && is streaming
-        }).map((GuildMember) => {
-            const member = GuildMember;
-            member.stream = member.presence.activities.filter((Game) => Game.streaming).shift();
+    //         return streamer && live; // has partner role && is streaming
+    //     }).map((GuildMember) => {
+    //         const member = GuildMember;
+    //         member.stream = member.presence.activities.filter((Game) => Game.streaming).shift();
 
-            return member;
-        });
-    }
+    //         return member;
+    //     });
+    // }
 
-    createRefreshEmbed(GuildMember) {
-        return new Discord.RichEmbed()
-            .setColor('#9013FE')
-            .setImage(GuildMember.twitch.live.thumbnailUrl.replace('{width}', '192').replace('{height}', '108'))
-            .setAuthor(GuildMember.twitch.user.displayName,
-                GuildMember.twitch.user.profilePictureUrl,
-                GuildMember.stream.url)
-            .setFooter(`${GuildMember.twitch.live.viewers} viewers • started ${this.time.format(GuildMember.twitch.live.startDate)}`);
-    }
+    // createRefreshEmbed(GuildMember) {
+    //     return new Discord.RichEmbed()
+    //         .setColor('#9013FE')
+    //         .setImage(GuildMember.twitch.live.thumbnailUrl.replace('{width}', '192').replace('{height}', '108'))
+    //         .setAuthor(GuildMember.twitch.user.displayName,
+    //             GuildMember.twitch.user.profilePictureUrl,
+    //             GuildMember.stream.url)
+    //         .setFooter(`${GuildMember.twitch.live.viewers} viewers • started ${this.time.format(GuildMember.twitch.live.startDate)}`);
+    // }
 }
 
 module.exports = DiscordWrapper;

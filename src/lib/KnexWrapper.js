@@ -24,30 +24,30 @@ class KnexWrapper {
         } else this.log.debug(`Knex authenticated: ${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}/${process.env.DB_NAME}`);
     }
 
-    async truncateLiveStreamers() {
-        await this.client(process.env.DB_TABLE_LIVE_STREAMERS).truncate();
-        this.log.debug(`Truncated ${process.env.DB_HOST}/${process.env.DB_NAME}/${process.env.DB_TABLE_LIVE_STREAMERS}`);
-    }
+    // async truncateLiveStreamers() {
+    //     await this.client(process.env.DB_TABLE_LIVE_STREAMERS).truncate();
+    //     this.log.debug(`Truncated ${process.env.DB_HOST}/${process.env.DB_NAME}/${process.env.DB_TABLE_LIVE_STREAMERS}`);
+    // }
 
-    async saveLiveStreamers(members) {
-        const results = members.map((GuildMember) => ({
-            user_id: GuildMember.twitch.live.userId,
-            stream_id: GuildMember.twitch.live.id,
-            title: GuildMember.twitch.live.title,
-            name: GuildMember.twitch.live.userDisplayName,
-            url: GuildMember.stream.url,
-            thumbnail: GuildMember.twitch.live.thumbnailUrl,
-            viewers: GuildMember.twitch.live.viewers,
-            started_at: KnexWrapper.now(GuildMember.twitch.live.startDate),
-            created_at: KnexWrapper.now(),
-        }));
+    // async saveLiveStreamers(members) {
+    //     const results = members.map((GuildMember) => ({
+    //         user_id: GuildMember.twitch.live.userId,
+    //         stream_id: GuildMember.twitch.live.id,
+    //         title: GuildMember.twitch.live.title,
+    //         name: GuildMember.twitch.live.userDisplayName,
+    //         url: GuildMember.stream.url,
+    //         thumbnail: GuildMember.twitch.live.thumbnailUrl,
+    //         viewers: GuildMember.twitch.live.viewers,
+    //         started_at: KnexWrapper.now(GuildMember.twitch.live.startDate),
+    //         created_at: KnexWrapper.now(),
+    //     }));
 
-        await this.client(process.env.DB_TABLE_LIVE_STREAMERS).insert(results);
-    }
+    //     await this.client(process.env.DB_TABLE_LIVE_STREAMERS).insert(results);
+    // }
 
-    static now(date) {
-        return (date || new Date()).toISOString().slice(0, 19).replace('T', ' ');
-    }
+    // static now(date) {
+    //     return (date || new Date()).toISOString().slice(0, 19).replace('T', ' ');
+    // }
 }
 
 module.exports = KnexWrapper;

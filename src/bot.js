@@ -28,35 +28,32 @@ class Bot {
             debug: (msg) => this.log.debug(msg),
             warn: (msg) => this.log.warn(msg),
             ready: () => {
-                this.guild = this.discord
-                    .client.guilds.find((obj) => obj.name === process.env.DISCORD_GUILD);
-                if (_.isNil(this.guild)) this.exit(`${this.discord.client.user.tag} not found on ${process.env.DISCORD_GUILD}`);
-                this.log.info(`${this.discord.client.user.tag} logged in on ${process.env.DISCORD_GUILD}`);
+                this.guild = this.discord.client.guilds.resolve(process.env.DISCORD_GUILD);
+                if (_.isNil(this.guild)) this.exit(`${this.discord.client.user.tag} not on guild# ${process.env.DISCORD_GUILD}`);
+                else this.log.info(`${this.discord.client.user.tag} logged in on ${this.guild.name}`);
 
-                this.general = this.guild
-                    .roles.find((obj) => obj.name === process.env.DISCORD_GUILD_ROLE_GENERAL);
-                if (_.isNil(this.general)) this.abort('General rank not found');
-
-                this.colonel = this.guild
-                    .roles.find((obj) => obj.name === process.env.DISCORD_GUILD_ROLE_COLONEL);
-                if (_.isNil(this.colonel)) this.abort('Colonel rank not found');
-
-                this.streamer = this.guild
-                    .roles.find((obj) => obj.name === process.env.DISCORD_GUILD_ROLE_STREAMER);
-                if (_.isNil(this.streamer)) this.abort('Streamer rank not found');
+                this.admin = this.guild.roles.resolve(process.env.DISCORD_ROLE_ADMIN);
+                if (_.isNil(this.admin)) this.abort('Admin rank not found');
+                this.streamer_std = this.guild.roles.resolve(process.env.DISCORD_ROLE_STREAMER_STD);
+                if (_.isNil(this.streamer_std)) this.abort('Streamer standard rank not found');
+                this.streamer_pro = this.guild.roles.resolve(process.env.DISCORD_ROLE_STREAMER_PRO);
+                if (_.isNil(this.streamer_pro)) this.abort('Streamer promoted rank not found');
+                this.streamer_vip = this.guild.roles.resolve(process.env.DISCORD_ROLE_STREAMER_VIP);
+                if (_.isNil(this.streamer_vip)) this.abort('Streamer vip rank not found');
 
                 this.discord.setActivity(this.guild.memberCount);
-                this.discord.client.setTimeout(() => this.refresh(), 1 * 1000);
-                this.discord.client.setInterval(() => this.refresh(),
-                    process.env.BOT_REFRESH * 60 * 1000);
+
+                // this.discord.client.setTimeout(() => this.refresh(), 1 * 1000);
+                // this.discord.client.setInterval(() => this.refresh(),
+                //     process.env.BOT_REFRESH * 60 * 1000);
             },
-            guildMemberAdd: (member) => {
-                this.log.verbose(`${member.user.tag} has joined ${process.env.DISCORD_GUILD}`);
-                this.discord.setActivity(member.guild.memberCount);
+            guildMemberAdd: (GuildMember) => {
+                this.log.verbose(`${GuildMember.user.tag} has joined ${this.guild.name}`);
+                if (GuildMember.guild.available) this.discord.setActivity(GuildMember.guild.memberCount);
             },
-            guildMemberRemove: (member) => {
-                this.log.verbose(`${member.user.tag} has left ${process.env.DISCORD_GUILD}`);
-                this.discord.setActivity(member.guild.memberCount);
+            guildMemberRemove: (GuildMember) => {
+                this.log.verbose(`${GuildMember.user.tag} has left ${this.guild.name}`);
+                if (GuildMember.guild.available) this.discord.setActivity(GuildMember.guild.memberCount);
             },
             message: async (msg) => {
                 const prefix = process.env.BOT_PREFIX.replace('%s', ' '); // ignore messages without prefix or other bots
@@ -67,67 +64,65 @@ class Bot {
 
                 if (cmd === 'ping') {
                     const reply = await msg.channel.send('Loading...');
-                    reply.edit(`Pong! Latency is ${reply.createdTimestamp - msg.createdTimestamp}ms. API Latency is ${Math.round(this.discord.client.ping)}ms`);
+                    reply.edit(`Pong! Latency is ${reply.createdTimestamp - msg.createdTimestamp}ms.`);
                 }
 
-                if (cmd === 'refresh') {
-                    if (msg.author.id !== process.env.DISCORD_OWNER) { // super-admin
-                        if (_.isNil(msg.member)) { // is DM?
-                            msg.reply('The refresh command is not available on DM');
-                            return;
-                        }
+                // if (cmd === 'refresh') {
+                //     if (msg.author.id !== process.env.DISCORD_OWNER) { // super-admin
+                //         if (_.isNil(msg.member)) { // is DM?
+                //             msg.reply('The refresh command is not available on DM');
+                //             return;
+                //         }
 
-                        const general = !_.isNil(this.general)
-                            && msg.member.roles.has(this.general.id);
-                        const colonel = !_.isNil(this.colonel)
-                            && msg.member.roles.has(this.colonel.id);
-                        if (!(general || colonel)) { // not general or colonel?
-                            msg.reply('Forbidden, security clearance required');
-                            return;
-                        }
-                    }
+                //         const admin = !_.isNil(this.admin)
+                //             && msg.member.roles.has(this.admin.id);
+                //         if (!(admin)) { // not admin?
+                //             msg.reply('Forbidden, security clearance required');
+                //             return;
+                //         }
+                //     }
 
-                    const reply = await msg.channel.send('Refreshing...');
-                    const members = await this.refresh();
-                    if (members.length) {
-                        reply.edit(`Refreshed ${members.length} ${Bot.lex(members.length)}`);
-                        _.forEach(members, (member) => {
-                            msg.channel.send(this.discord.createRefreshEmbed(member));
-                        });
-                    } else reply.edit('No live streamers found');
-                }
+                //     const reply = await msg.channel.send('Refreshing...');
+                //     const members = await this.refresh();
+                //     if (members.length) {
+                //         reply.edit(`Refreshed ${members.length} ${Bot.lex(members.length)}`);
+                //         _.forEach(members, (member) => {
+                //             msg.channel.send(this.discord.createRefreshEmbed(member));
+                //         });
+                //     } else reply.edit('No live streamers found');
+                // }
             },
         };
     }
 
-    async refresh() {
-        let members = DiscordWrapper.filterGuildMembers(this.guild, this.streamer);
-        if (members.length) {
-            this.log.info(`Found ${members.length} potential ${Bot.lex(members.length)}: ${_.map(members, 'user.tag').join(', ')}`);
+    // async refresh() {
+    //     let members = DiscordWrapper.filterGuildMembers(this.guild, this.streamer);
+    //     if (members.length) {
+    //         this.log.info(`Found ${members.length} potential ${Bot.lex(members.length)}: ${_.map(members, 'user.tag').join(', ')}`);
 
-            members = await this.twitch.filterLiveStreamers(members);
-            if (members.length) {
-                this.log.info(`Filtered down to ${members.length} valid ${Bot.lex(members.length)}: ${_.map(members, 'user.tag').join(', ')}`);
+    //         members = await this.twitch.filterLiveStreamers(members);
+    //         if (members.length) {
+    //             this.log.info(`Filtered down to ${members.length} valid ${Bot.lex(members.length)}: ${_.map(members, 'user.tag').join(', ')}`);
 
-                await this.knex.truncateLiveStreamers();
-                await this.knex.saveLiveStreamers(members);
-                this.log.info(`Saved ${members.length} live ${Bot.lex(members.length)} in db: ${_.map(members, 'user.tag').join(', ')}`);
-                return members;
-            }
+    //             await this.knex.truncateLiveStreamers();
+    //             await this.knex.saveLiveStreamers(members);
+    //             this.log.info(`Saved ${members.length} live ${Bot.lex(members.length)} in db: ${_.map(members, 'user.tag').join(', ')}`);
+    //             return members;
+    //         }
 
-            await this.knex.truncateLiveStreamers();
-            this.log.warn('Filtering down resulted in no valid streamers');
-            return members;
-        }
+    //         await this.knex.truncateLiveStreamers();
+    //         this.log.warn('Filtering down resulted in no valid streamers');
+    //         return members;
+    //     }
 
-        await this.knex.truncateLiveStreamers();
-        this.log.warn('No potential streamers were found');
-        return members;
-    }
+    //     await this.knex.truncateLiveStreamers();
+    //     this.log.warn('No potential streamers were found');
+    //     return members;
+    // }
 
-    static lex(count) {
-        return count === 1 ? 'streamer' : 'streamers';
-    }
+    // static lex(count) {
+    //     return count === 1 ? 'streamer' : 'streamers';
+    // }
 
     abort(msg) {
         this.log.warn(msg);
